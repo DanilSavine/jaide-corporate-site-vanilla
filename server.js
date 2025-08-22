@@ -10,7 +10,7 @@ const axios = require('axios');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3002;
 
 // Initialize Resend only if API key is provided
 let resend = null;
@@ -38,13 +38,20 @@ const limiter = rateLimit({
 
 // CORS configuration
 app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['http://localhost:3000', 'https://jaide.care'],
+  origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['http://localhost:3002', 'https://jaide.care'],
   credentials: true
 }));
 
 // Body parser middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// API routes (before static files to prevent conflicts)
+// Endpoint to get public reCAPTCHA site key
+app.get('/api/recaptcha-site-key', (req, res) => {
+  const siteKey = process.env.RECAPTCHA_SITE_KEY || '6LeJWT0rAAAAAHS4se3bBGKE8VSSfL2XqISsSR11';
+  res.json({ siteKey });
+});
 
 // Serve static files
 app.use(express.static('.'));
